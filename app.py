@@ -32,7 +32,7 @@ def getStudent(id):
     id = int(id)
     if id >= studentID or id < 1:
         return f"No student with id {id}"
-    return DB['students'][id], 201
+    return DB['students'][id]
 
 @app.route('/classes/', methods=['POST'])
 def createClass():
@@ -45,14 +45,14 @@ def createClass():
         'students': [],
     }
     classID += 1
-    return DB['classes'][currentID]
+    return DB['classes'][currentID], 201
 
 @app.route('/classes/<id>', methods=['GET'])
 def getClass(id):
     id = int(id)
     if id >= classID or id < 1:
         return f"No class with id {id}"
-    return DB['classes'][id], 201
+    return DB['classes'][id]
 
 @app.route('/classes/<id>', methods=['PATCH'])
 def addStudentToClass(id):
@@ -71,7 +71,7 @@ def addStudentToClass(id):
             DB['students'][sID]
         )
         print(f"Student with id {sID} is already in this class.")
-    return DB['classes'][cID]
+    return DB['classes'][cID], 201
 
 def studentAlreadyInClass(cID, sID):
     students = DB['classes'][cID]['students']
