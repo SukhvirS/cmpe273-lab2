@@ -16,7 +16,7 @@ def hello():
     return f'Hello, {escape(name)}!'
 
 @app.route('/students/', methods=['POST'])
-def create_student():
+def createStudent():
     global studentID
     req = request.json
     currentID = studentID
@@ -28,14 +28,14 @@ def create_student():
     return DB['students'][currentID], 201
 
 @app.route('/students/<id>', methods=['GET'])
-def get_student(id):
+def getStudent(id):
     id = int(id)
     if id >= studentID or id < 1:
         return f"No student with id {id}"
     return DB['students'][id], 201
 
 @app.route('/classes/', methods=['POST'])
-def create_class():
+def createClass():
     global classID
     req = request.json
     currentID = classID
@@ -45,20 +45,38 @@ def create_class():
         'students': [],
     }
     classID += 1
-    return DB['classes'][currentID], 201
+    return DB['classes'][currentID]
 
 @app.route('/classes/<id>', methods=['GET'])
-def get_class(id):
+def getClass(id):
     id = int(id)
     if id >= classID or id < 1:
         return f"No class with id {id}"
     return DB['classes'][id], 201
 
 @app.route('/classes/<id>', methods=['PATCH'])
-def add_student_to_class(id):
-    id = int(id)
+def addStudentToClass(id):
+    cID = int(id)
     req = request.json
-    DB['classes'][id]['students'].append(
-        DB['students'][req['student_id']]
-    )
-    return DB['classes'][id]
+    sID = req['student_id']
+
+    if cID >= classID:
+        return f"No class with id {cID}"
+
+    if sID >= studentID:
+        return f"No student with id {sID}"
+    
+    if not studentAlreadyInClass(cID, sID):        
+        DB['classes'][cID]['students'].append(
+            DB['students'][sID]
+        )
+        print(f"Student with id {sID} is already in this class.")
+    return DB['classes'][cID]
+
+def studentAlreadyInClass(cID, sID):
+    students = DB['classes'][cID]['students']
+    for student in students:
+        if student['id'] == sID:
+            return True
+    return False
+    
